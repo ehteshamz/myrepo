@@ -1,0 +1,34 @@
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title> Index </title>
+		<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">	
+		<script src="https://cdn.tailwindcss.com"></script>	
+		<style>
+			body {
+			position: relative;
+			}
+
+			body::before {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background-image: url(https://images.unsplash.com/photo-1604011237320-8e0506614fdf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1808&q=80);
+				background-repeat: no-repeat;
+				background-size: cover;
+				opacity: 0.4;
+			}
+		</style>
+	</head>
+	<body class="bg-black font-mono overflow-scroll">
+		<div class="relative text-white min-h-screen">
+				<div class="text-center"  line-height="200px" height="200px" margin-top="50%">
+					<div class="text-5xl font-black m-2 mt-8">Congratulations!</div>
+					<div class="text-2xl m-2">You have successfully signed in!</div>
+				</div>
+		</div>
+	</body>
+</html>
