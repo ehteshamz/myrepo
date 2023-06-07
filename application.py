@@ -2,12 +2,9 @@ from flask import Flask, render_template, request, redirect, url_for, session, R
 import os
 import boto3
 from fileinput import filename
-from flask_socketio import SocketIO
-
+import time
 #import cv2
 application = Flask(__name__)
-socketio = SocketIO(application)
-
 
 #Define the access keys
 region = 'us-east-1'
@@ -26,21 +23,6 @@ s3 = boto3.client("s3", region_name=region,aws_access_key_id=accessKeyId,
 rekognition = boto3.client('rekognition', region_name=region,aws_access_key_id=accessKeyId,
          aws_secret_access_key=secretAccessKey)
 
-@socketio.on("connect")
-def test_connect():
-    print("Connected")
-    #emit("my response", {"data": "Connected"})
-
-
-@socketio.on("image")
-def receive_image(image):
-    # Decode the base64-encoded image data
-    print("Image received")
-    base64_data = image.split(",")[1]
-    with open("imageToSave.png", "wb") as fh:
-        fh.write(base64.decodebytes(base64_data.encode()))
-    #image = base64_to_image(image)
-
 @application.route('/')
 @application.route('/login', methods =['GET', 'POST'])
 def login():
@@ -56,16 +38,14 @@ def login():
 				s3.upload_file(imagefile.filename, bucket, username + 'loginimg.png')
 			except:
 				message = 'There was a problem'
-#		elif request.form.get('click') == 'Capture':
-#			cam = cv2.VideoCapture(0)
-#			result, image = cam.read()
-#			if result:
-#				cv2.imwrite("userimagelogin.png", image)
-				#Upload the file provided by the user in an S3 bucket
-#				try:
-#					s3.upload_file("userimagelogin.png", bucket, username + 'loginimg.png')
-#				except:
-#					message = 'There was a problem'
+		elif request.form.get('click') == 'Capture':
+			imagefile = request.files['file']
+			imagefile.save("userimagelogin.png")
+			#Upload the file provided by the user in an S3 bucket
+			try:
+				s3.upload_file("userimagelogin.png", bucket, username + 'loginimg.png')
+			except:
+				message = 'There was a problem'
 		else:
 			message = "Please fill out the form"
 			return render_template('login.html', message = message)
@@ -120,18 +100,17 @@ def register():
 				msg = 'There was a problem during registration'
 				return render_template('register.html', msg = msg)
 		elif request.form.get('click') == 'Capture':
-#			cam = cv2.VideoCapture(0)
-#			result, image = cam.read()
-#			if result:
-#				cv2.imwrite("userimage.png", image)
-				#Upload the file provided by the user in an S3 bucket
-#				try:
-#					s3.upload_file("userimage.png", bucket, username + ".png")
-#					msg = 'Registered Successfully!'
-#					return render_template('login.html', msg = msg)
-#				except:
-#					msg = 'There was a problem during registration'
-					return render_template('register.html', msg = msg)
+			imagefile = request.files['image']
+			filename = ('%s.png' % time.strftime("%Y%m%d-%H%M%S"))
+            imagefile.save(filename)
+			#Upload the file provided by the user in an S3 bucket
+			try:
+				s3.upload_file(filename, bucket, username + '.png')
+				msg = 'Registered Successfully!'
+				return render_template('login.html', msg = msg)
+			except:
+				msg = 'There was a problem during registration'
+				return render_template('register.html', msg = msg)
 		else:
 			msg = "Please fill out the form"
 			return render_template('register.html', msg = msg)

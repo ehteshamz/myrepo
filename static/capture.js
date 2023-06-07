@@ -2,12 +2,6 @@
 // width to the value defined here, but the height will be
 // calculated based on the aspect ratio of the input stream.
 
-var socket = io.connect(window.location.protocol + '//' + document.domain + ':' + location.port, {
-    transports: ['websocket']
-});
-socket.on('connect', function () {
-    console.log("Connected...!", socket.connected)
-});
 
 var width = 320;    // We will scale the photo width to this
 var height = 0;     // This will be computed based on the input stream
@@ -23,6 +17,7 @@ var streaming = false;
 var video = null;
 var canvas = null;
 var photo = null;
+
 var startbutton = null;
 
 function startup() {
@@ -84,6 +79,19 @@ function clearphoto() {
 // format data URL. By drawing it on an offscreen canvas and then
 // drawing that to the screen, we can change its size and/or apply
 // other changes before drawing it.
+function postFile(file) {
+    let formdata = new FormData();
+    formdata.append("image", file);
+    let xhr = new XMLHttpRequest();
+    xhr.open('POST', '/register', true);
+    xhr.onload = function () {
+        if (this.status === 200)
+            console.log(this.response);
+        else
+            console.error(xhr);
+    };
+    xhr.send(formdata);
+}
 
 function takepicture() {
   var context = canvas.getContext('2d');
@@ -93,8 +101,9 @@ function takepicture() {
     context.drawImage(video, 0, 0, width, height);
 
     var data = canvas.toDataURL('image/png');
-    socket.emit('image', data);
     photo.setAttribute('src', data);
+
+    canvas.toBlob(postFile, 'image/png');
   } else {
     clearphoto();
   }
