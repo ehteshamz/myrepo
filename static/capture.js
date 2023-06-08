@@ -83,7 +83,7 @@ function postFile(file) {
     let formdata = new FormData();
     formdata.append("image", file);
     let xhr = new XMLHttpRequest();
-    xhr.open('POST', '/register', true);
+    xhr.open('POST', '/image', true);
     xhr.onload = function () {
         if (this.status === 200)
             console.log(this.response);

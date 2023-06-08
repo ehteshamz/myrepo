@@ -42,6 +42,14 @@ rekognition = boto3.client(
 
 
 @application.route("/")
+
+@application.route("/image", methods=["POST"])
+def image():
+
+    imagefile = request.files["image"]  # get the image
+    imagefile.save("capturedImage.png")
+    return ('', 204)
+
 @application.route("/login", methods=["GET", "POST"])
 def login():
     message = ""
@@ -51,13 +59,13 @@ def login():
         and request.form["username"] != ""
     ):
         username = request.form["username"]
-        if (not os.path.isfile("loginImage.png")):
+        if (not os.path.isfile("capturedImage.png")):
             imagefile = request.files["file"]
-            imagefile.save("loginImage.png")
+            imagefile.save("capturedImage.png")
             # Upload the file provided by the user in an S3 bucket
         try:
-            s3.upload_file("loginImage.png", bucket, username + "loginimg.png")
-            os.remove("loginImage.png")
+            s3.upload_file("capturedImage.png", bucket, username + "loginimg.png")
+            os.remove("capturedImage.png")
         except:
             msg = "There was a problem during login"
             return render_template("login.html", msg=msg)
@@ -100,13 +108,6 @@ def logout():
     return redirect(url_for("login"))
 
 
-@application.route("/image", methods=["POST"])
-def image():
-
-    imagefile = request.files["image"]  # get the image
-    imagefile.save("registerImage.png")
-
-
 @application.route("/register", methods=["GET", "POST"])
 def register():
     msg = ""
@@ -116,14 +117,14 @@ def register():
         and request.form["username"] != ""
     ):
         username = request.form["username"]
-        if (not os.path.isfile("registerImage.png")):
+        if (not os.path.isfile("capturedImage.png")):
             imagefile = request.files["file"]
-            imagefile.save("registerImage.png")
+            imagefile.save("capturedImage.png")
             # Upload the file provided by the user in an S3 bucket
         try:
-            s3.upload_file("registerImage.png", bucket, username + ".png")
+            s3.upload_file("capturedImage.png", bucket, username + ".png")
             msg = "Registered Successfully!"
-            os.remove("registerImage.png")
+            os.remove("capturedImage.png")
             return render_template("login.html", msg=msg)
         except:
             msg = "There was a problem during registration"
